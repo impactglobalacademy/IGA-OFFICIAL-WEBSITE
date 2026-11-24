@@ -407,7 +407,7 @@
       try {
         showLoadingState('Processing enrolment...');
 
-        const result = await enrollProgramme(user.uid, currentProgramme.id);
+        const result = await enrolInProgramme(currentProgramme.id);
 
         if (result.success) {
           showNotification('Successfully enrolled! Redirecting to dashboard...', 'success');
