@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Sign In - IMPACT Global Academy</title>
+  <link rel="icon" type="image/x-icon" href="../favicon.ico">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body data-page="admin-login">
+  <!-- Notification Container -->
+  <div id="notificationContainer" style="position: fixed; top: var(--spacing-xl); right: var(--spacing-xl); z-index: 3000; max-width: 400px;"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" class="hidden" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    gap: var(--spacing-lg);
+    color: var(--white);
+    font-weight: 600;
+  "></div>
+
+  <!-- Header -->
+  <header>
+    <div class="header-container">
+      <a href="../" class="logo">
+        <div class="logo-icon">I.G.A</div>
+        <span>IMPACT Global</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main style="min-height: 80vh; display: flex; align-items: center; background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-700) 100%);">
+    <div class="container-sm">
+      <div class="card" style="max-width: 500px; margin: 0 auto;">
+        <div style="text-align: center; margin-bottom: var(--spacing-2xl);">
+          <div style="background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark)); padding: var(--spacing-lg); border-radius: var(--radius-xl); width: 80px; height: 80px; margin: 0 auto var(--spacing-lg); display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 32px; font-weight: 700;">
+            I.G.A
+          </div>
+          <h1 style="margin-bottom: var(--spacing-sm);">Admin Dashboard</h1>
+          <p style="color: var(--gray-600);">Sign in to access the administration panel</p>
+        </div>
+
+        <!-- Authentication Notice -->
+        <div style="background-color: var(--primary-50); border-left: 4px solid var(--primary-600); padding: var(--spacing-lg); border-radius: var(--radius-lg); margin-bottom: var(--spacing-lg);">
+          <p style="font-size: var(--font-size-sm); color: var(--primary-900); margin: 0;">
+            <strong>🔒 Secure Area:</strong> Admin access is restricted to authorized personnel only. Unauthorized access attempts are logged.
+          </p>
+        </div>
+
+        <form id="adminLoginForm" style="margin-bottom: var(--spacing-lg);">
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="admin@impactglobalacademy.com" required>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" placeholder="••••••••" required>
+          </div>
+
+          <div style="display: flex; align-items: center; margin-bottom: var(--spacing-lg);">
+            <input type="checkbox" id="rememberMe" name="rememberMe" style="width: auto; margin-right: var(--spacing-md); cursor: pointer;">
+            <label for="rememberMe" style="margin: 0; cursor: pointer;">Remember me on this device</label>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; margin-bottom: var(--spacing-lg);">
+            Sign In
+          </button>
+        </form>
+
+        <!-- Additional Options -->
+        <div style="text-align: center; padding-top: var(--spacing-lg); border-top: 1px solid var(--gray-200);">
+          <p style="color: var(--gray-600); font-size: var(--font-size-sm); margin-bottom: var(--spacing-lg);">
+            Need help signing in?
+          </p>
+          <a href="../contact.html" class="btn btn-outline btn-sm" style="display: inline-block;">Contact Support</a>
+        </div>
+
+        <!-- Footer Info -->
+        <div style="margin-top: var(--spacing-2xl); padding-top: var(--spacing-lg); border-top: 1px solid var(--gray-200); text-align: center; font-size: var(--font-size-xs); color: var(--gray-600);">
+          <p>If you don't have admin access and believe you should, please contact your system administrator.</p>
+          <p style="margin-top: var(--spacing-sm);">
+            <a href="../" style="color: var(--primary-600);">← Back to Website</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js"></script>
+
+  <!-- Configuration & APIs -->
+  <script src="../config.js"></script>
+  <script src="../api.js"></script>
+  <script src="../script.js"></script>
+
+  <script>
+    /**
+     * Handle admin login
+     */
+    document.getElementById('adminLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        showLoadingState('Signing in...');
+
+        // Login
+        const loginResult = await loginUser(email, password);
+        
+        if (!loginResult.success) {
+          showNotification(loginResult.error, 'error');
+          hideLoadingState();
+          return;
+        }
+
+        // Check if user is admin
+        const user = await getCurrentUser();
+        
+        if (!user || !['super_admin', 'admin', 'editor'].includes(user.role)) {
+          showNotification('Access denied: You do not have admin privileges', 'error');
+          await logoutUser();
+          hideLoadingState();
+          return;
+        }
+
+        // Successful admin login
+        showNotification('Admin access granted!', 'success');
+        
+        // Remember user if checkbox is checked
+        if (document.getElementById('rememberMe').checked) {
+          localStorage.setItem('adminRemembered', email);
+        }
+
+        // Redirect to admin dashboard
+        setTimeout(() => {
+          window.location.href = '../admin/index.html';
+        }, 1500);
+      } catch (error) {
+        console.error('Admin login error:', error);
+        showNotification('Error signing in', 'error');
+        hideLoadingState();
+      }
+    });
+
+    /**
+     * Check if already logged in as admin
+     */
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const user = await getCurrentUser();
+        
+        if (user && ['super_admin', 'admin', 'editor'].includes(user.role)) {
+          // Already logged in as admin, redirect to dashboard
+          window.location.href = '../admin/index.html';
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      }
+    });
+  </script>
+</body>
+</html>

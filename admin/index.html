@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin Dashboard - IMPACT Global Academy</title>
+  <link rel="icon" type="image/x-icon" href="../favicon.ico">
+  <link rel="stylesheet" href="../admin/admin-style.css">
+</head>
+<body data-page="admin-dashboard">
+  <!-- Notification Container -->
+  <div id="notificationContainer" style="position: fixed; top: var(--spacing-xl); right: var(--spacing-xl); z-index: 3000; max-width: 400px;"></div>
+
+  <!-- Loading Overlay -->
+  <div id="loadingOverlay" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    gap: var(--spacing-lg);
+    color: var(--white);
+    font-weight: 600;
+  " class="hidden"></div>
+
+  <!-- Admin Layout -->
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-header">
+        <div class="logo-icon">I.G.A</div>
+        <h2>IMPACT Admin</h2>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#" data-page="dashboard" class="nav-item active">
+          <span class="icon">📊</span> Dashboard
+        </a>
+        <a href="#" data-page="programmes" class="nav-item">
+          <span class="icon">📚</span> Programmes
+        </a>
+        <a href="#" data-page="faculty" class="nav-item">
+          <span class="icon">👥</span> Faculty
+        </a>
+        <a href="#" data-page="events" class="nav-item">
+          <span class="icon">📅</span> Events
+        </a>
+        <a href="#" data-page="resources" class="nav-item">
+          <span class="icon">📖</span> Resources
+        </a>
+        <a href="#" data-page="impact-stories" class="nav-item">
+          <span class="icon">⭐</span> Impact Stories
+        </a>
+        <a href="#" data-page="contact" class="nav-item">
+          <span class="icon">💬</span> Contact Submissions
+        </a>
+        <a href="#" data-page="users" class="nav-item">
+          <span class="icon">👤</span> Users
+        </a>
+        <a href="#" data-page="newsletter" class="nav-item">
+          <span class="icon">📧</span> Newsletter
+        </a>
+        <a href="#" data-page="analytics" class="nav-item">
+          <span class="icon">📈</span> Analytics
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="btn btn-danger btn-sm" style="width: 100%;">Sign Out</button>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <!-- Top Bar -->
+      <div class="admin-topbar">
+        <h1 id="pageTitle">Dashboard</h1>
+        <div class="topbar-actions">
+          <div class="dropdown">
+            <button class="user-menu-btn">
+              👤 <span id="userName">Admin</span>
+            </button>
+            <div class="dropdown-menu" id="userMenu">
+              <a href="#" onclick="editProfile()">Edit Profile</a>
+              <a href="#" onclick="changePassword()">Change Password</a>
+              <div class="dropdown-divider"></div>
+              <button onclick="handleAdminLogout()">Sign Out</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page Content -->
+      <div class="admin-content">
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="admin-page active">
+          <div class="grid grid-4">
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #dbeafe;">📊</div>
+              <div class="stat-content">
+                <div class="stat-value" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #fef3c7;">📚</div>
+              <div class="stat-content">
+                <div class="stat-value" id="totalProgrammes">0</div>
+                <div class="stat-label">Programmes</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #dcfce7;">👥</div>
+              <div class="stat-content">
+                <div class="stat-value" id="totalEnrolments">0</div>
+                <div class="stat-label">Total Enrolments</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #f3e8ff;">💬</div>
+              <div class="stat-content">
+                <div class="stat-value" id="contactSubmissions">0</div>
+                <div class="stat-label">Contact Msgs</div>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: var(--spacing-2xl);">
+            <div class="card">
+              <div class="card-header">
+                <h2>Quick Actions</h2>
+              </div>
+              <div class="card-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--spacing-lg);">
+                <button class="btn btn-primary" onclick="goToPage('programmes')">+ Add Programme</button>
+                <button class="btn btn-secondary" onclick="goToPage('faculty')">+ Add Faculty</button>
+                <button class="btn btn-primary" onclick="goToPage('events')">+ Create Event</button>
+                <button class="btn btn-secondary" onclick="goToPage('impact-stories')">+ Add Story</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Programmes Page -->
+        <div id="programmes" class="admin-page">
+          <div class="page-header">
+            <h2>Manage Programmes</h2>
+            <button class="btn btn-primary" onclick="openProgrammeForm()">+ Add Programme</button>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Duration</th>
+                    <th>Price (USD)</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="programmesTable">
+                  <tr><td colspan="6" style="text-align: center; padding: var(--spacing-2xl);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Faculty Page -->
+        <div id="faculty" class="admin-page">
+          <div class="page-header">
+            <h2>Manage Faculty</h2>
+            <button class="btn btn-primary" onclick="openFacultyForm()">+ Add Faculty</button>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Title</th>
+                    <th>Expertise</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="facultyTable">
+                  <tr><td colspan="4" style="text-align: center; padding: var(--spacing-2xl);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Events Page -->
+        <div id="events" class="admin-page">
+          <div class="page-header">
+            <h2>Manage Events</h2>
+            <button class="btn btn-primary" onclick="openEventForm()">+ Add Event</button>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Date</th>
+                    <th>Format</th>
+                    <th>Location</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="eventsTable">
+                  <tr><td colspan="5" style="text-align: center; padding: var(--spacing-2xl);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Resources Page -->
+        <div id="resources" class="admin-page">
+          <div class="page-header">
+            <h2>Manage Resources</h2>
+            <button class="btn btn-primary" onclick="openResourceForm()">+ Add Resource</button>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Category</th>
+                    <th>Type</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="resourcesTable">
+                  <tr><td colspan="4" style="text-align: center; padding: var(--spacing-2xl);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Impact Stories Page -->
+        <div id="impact-stories" class="admin-page">
+          <div class="page-header">
+            <h2>Manage Impact Stories</h2>
+            <button class="btn btn-primary" onclick="openStoryForm()">+ Add Story</button>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Published</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="storiesTable">
+                  <tr><td colspan="4" style="text-align: center; padding: var(--spacing-2xl);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Submissions Page -->
+        <div id="contact" class="admin-page">
+          <div class="page-header">
+            <h2>Contact Submissions</h2>
+            <button class="btn btn-secondary" onclick="exportContacts()">Export</button>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="contactTable">
+                  <tr><td colspan="6" style="text-align: center; padding: var(--spacing-2xl);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Users Page -->
+        <div id="users" class="admin-page">
+          <div class="page-header">
+            <h2>Manage Users</h2>
+          </div>
+
+          <div class="card">
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Joined</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTable">
+                  <tr><td colspan="5" style="text-align: center; padding: var(--spacing-2xl);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Newsletter Page -->
+        <div id="newsletter" class="admin-page">
+          <div class="page-header">
+            <h2>Newsletter Management</h2>
+            <div>
+              <button class="btn btn-secondary" onclick="exportNewsletter()">Export Subscribers</button>
+            </div>
+          </div>
+
+          <div class="grid grid-2" style="margin-bottom: var(--spacing-2xl);">
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #dbeafe;">📧</div>
+              <div class="stat-content">
+                <div class="stat-value" id="subscriberCount">0</div>
+                <div class="stat-label">Active Subscribers</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #fecaca;">🚫</div>
+              <div class="stat-content">
+                <div class="stat-value" id="unsubscribedCount">0</div>
+                <div class="stat-label">Unsubscribed</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>Recent Subscribers</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="admin-table">
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Full Name</th>
+                    <th>Subscribed Date</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="subscribersTable">
+                  <tr><td colspan="5" style="text-align: center; padding: var(--spacing-2xl);">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Analytics Page -->
+        <div id="analytics" class="admin-page">
+          <h2>Analytics Dashboard</h2>
+
+          <div class="grid grid-4" style="margin-bottom: var(--spacing-2xl);">
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #dbeafe;">👤</div>
+              <div class="stat-content">
+                <div class="stat-value" id="analyticsUsers">0</div>
+                <div class="stat-label">Total Users</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #fef3c7;">📚</div>
+              <div class="stat-content">
+                <div class="stat-value" id="analyticsProgrammes">0</div>
+                <div class="stat-label">Programmes</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #dcfce7;">✓</div>
+              <div class="stat-content">
+                <div class="stat-value" id="analyticsEnrolments">0</div>
+                <div class="stat-label">Total Enrolments</div>
+              </div>
+            </div>
+
+            <div class="card stat-card">
+              <div class="stat-icon" style="background-color: #f3e8ff;">📝</div>
+              <div class="stat-content">
+                <div class="stat-value" id="analyticsContacts">0</div>
+                <div class="stat-label">Contact Submissions</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h3>System Information</h3>
+            </div>
+            <div class="card-content">
+              <div style="display: grid; grid-template-columns: 200px 1fr; gap: var(--spacing-lg);">
+                <strong>Last Updated:</strong>
+                <span id="lastUpdated">-</span>
+
+                <strong>Admin Version:</strong>
+                <span>v1.0.0</span>
+
+                <strong>Database:</strong>
+                <span>Firebase Firestore</span>
+
+                <strong>Authentication:</strong>
+                <span>Firebase Auth</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Modals -->
+  <!-- Programme Form Modal -->
+  <div id="programmeModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Add/Edit Programme</h2>
+        <button class="modal-close" onclick="closeModal('programmeModal')">×</button>
+      </div>
+      <form id="programmeForm" onsubmit="saveProgramme(event)">
+        <div class="form-group">
+          <label>Title *</label>
+          <input type="text" name="title" required>
+        </div>
+        <div class="form-group">
+          <label>Category *</label>
+          <select name="category" required>
+            <option value="">Select Category</option>
+            <option value="LAP">Leadership Acceleration Program</option>
+            <option value="CAP">Campus Activation Program</option>
+            <option value="BAP">Business Acceleration Program</option>
+            <option value="SPECIALIZED">Specialized Programme</option>
+            <option value="MAP">Mission & Ministry Programs</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Short Description *</label>
+          <textarea name="shortDescription" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Full Description *</label>
+          <textarea name="description" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Duration (weeks) *</label>
+          <input type="number" name="durationWeeks" min="1" required>
+        </div>
+        <div class="form-group">
+          <label>Price (USD) *</label>
+          <input type="number" name="investmentUsd" min="0" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Price (NGN) *</label>
+          <input type="number" name="investmentNgn" min="0" step="0.01" required>
+        </div>
+        <div class="form-group">
+          <label>Image URL</label>
+          <input type="url" name="imageUrl">
+        </div>
+        <div class="form-group">
+          <label>Status *</label>
+          <select name="status" required>
+            <option value="draft">Draft</option>
+            <option value="published">Published</option>
+            <option value="archived">Archived</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" name="featured">
+            Featured Programme
+          </label>
+        </div>
+        <div style="display: flex; gap: var(--spacing-lg);">
+          <button type="submit" class="btn btn-primary">Save Programme</button>
+          <button type="button" class="btn btn-ghost" onclick="closeModal('programmeModal')">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage.js"></script>
+
+  <!-- Configuration & APIs -->
+  <script src="../config.js"></script>
+  <script src="../api.js"></script>
+  <script src="../admin/admin-api.js"></script>
+  <script src="../admin/admin-script.js"></script>
+</body>
+</html>
