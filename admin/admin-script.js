@@ -243,6 +243,10 @@ async function loadProgrammesData() {
     if (result.success) {
       allProgrammes = result.data;
       renderProgrammesTable(allProgrammes);
+    } else {
+      console.error('Programmes failed:', result.error);
+      document.getElementById('programmesTable').innerHTML =
+        '<tr><td colspan="6" style="text-align:center;padding:24px;color:#B91C1C;">Could not load programmes: ' + result.error + '</td></tr>';
     }
   } catch (error) {
     console.error('Error loading programmes:', error);
@@ -899,4 +903,19 @@ function formatDate(date) {
     month: 'short',
     day: 'numeric'
   }).format(new Date(date));
+}
+
+
+/* ============================================================================
+   USER MENU ACTIONS
+   ============================================================================ */
+
+/** Open the shared profile page */
+function editProfile() {
+  window.location.href = '../profile.html';
+}
+
+/** Password changes are handled on the profile page */
+function changePassword() {
+  window.location.href = '../profile.html#security';
 }
